@@ -31,10 +31,7 @@ Setup environment variables.
 * **SCDRE_EMAIL_PORT**      - Email port to use.
 * **SCDRE_EMAIL_HOST**      - Email host to use.
 * **SCDRE_FIREFOX_PROFILE** - Absolute path to firefox profile folder.
-
-		
-		'SCDRE_FIREFOX_PROFILE': environ['SCDRE_FIREFOX_PROFILE'],
-		'SCDRE_INSTANCE_PATH': instance_path
+* **SCDRE_INSTANCE_PATH**   - Application working folder.
 
 Make sure your browser downloads are always saved into instance folder of this project.
 
