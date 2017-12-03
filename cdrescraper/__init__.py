@@ -83,27 +83,40 @@ class FileDownloader(object):
 		text = ''
 		dirs = list()
 		dir_names = list()
+		next_page = True
 
-		# Get file link.
-		s2 = 'td:nth-child(3) a'
-		while i < len(el):
-			el2 = self.spobj.find_elements('css', s2, el[i])
-			try:
-				text = el2[0].text
-				h = el2[0]['href']
-			except KeyError:
-				text = ''
-				h = ''
-			finally:
-				if self.is_file(h):
-					el2[0].click()
-					self._count += 1
-				else:
-					dirs.append(h)
-					dir_names.append(text)
-					
-			# print('is_file ', self.is_file(h), ' --> ', text, ' --> ', h)
-			i += 1
+		while next_page:
+			# Get file link.
+			s2 = 'td:nth-child(3) a'
+			while i < len(el):
+				el2 = self.spobj.find_elements('css', s2, el[i])
+				try:
+					text = el2[0].text
+					h = el2[0]['href']
+				except KeyError:
+					text = ''
+					h = ''
+				finally:
+					if self.is_file(h):
+						el2[0].click()
+						self._count += 1
+					else:
+						dirs.append(h)
+						dir_names.append(text)
+						
+				# print('is_file ', self.is_file(h), ' --> ', text, ' --> ', h)
+				i += 1
+
+			# Check if next page exists.
+			s3 = '#pagingWPQ2next > a'
+			el3 = self.spobj.find_elements('css', s3)
+			if len(el3):
+				# Ensure that we trigger click.
+				h = self.spobj.browser.html
+				while h == self.spobj.browser.html:
+					el3[0].click()
+					el3[0].mouse_over()
+					h = self.spobj.browser.html
 
 		# print('dirs ', dir_names)
 		# We need to create directories on first lavel for proper file grouping.
