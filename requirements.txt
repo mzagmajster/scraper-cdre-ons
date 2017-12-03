@@ -1,2 +1,4 @@
 git+https://gitlab.com/Zag/minsplinter.git@python3
 click
+requests
+mailer

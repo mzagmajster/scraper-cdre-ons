@@ -1,7 +1,7 @@
 from time import sleep
 import click
 
-from cdrescraper import get_config, FileDownloader, ROOT_DIRS
+from cdrescraper import get_config, FileDownloader, ROOT_DIRS, send_notification, WebDirectoryLister, URL_TO_WATCH
 
 
 @click.group()
@@ -25,14 +25,37 @@ def download_files():
 
 
 
-@click.command('check-state', help="Checlk for change in web directory.")
+@click.command('check-state', help="Check for change in web directory.")
 def check_state():
-	pass
+	conf = get_config()
+	# More configuration.
+	conf['_URL_TO_WATCH'] = URL_TO_WATCH
 
+	# Get browser cookies so we can login when we are using requests package.
+	lo = FileDownloader(conf)
+	lo.login()
+	conf['_COOKIES'] = lo.get_cookies()
+
+	o = WebDirectoryLister(conf)
+	quit = False
+	print('Press CTRL + C to quit.')
+	while not quit:
+		try:
+			o.read()
+			if o.compare() == 1:
+				# Update & notify.
+				o.save()
+				send_notification(conf)
+			sleep(3)  # Do we really need to update so frequently?
+		except KeyboardInterrupt:
+			quit = True
+
+	lo.spobj.quit()
 
 @click.command('test')
 def test():
 	conf = get_config()
+	send_notification(conf)
 
 
 cli.add_command(download_files)

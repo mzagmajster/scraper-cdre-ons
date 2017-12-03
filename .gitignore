@@ -3,3 +3,4 @@
 /.idea
 /instance/*
 !/instance/__init__
+!/instance/notification.html

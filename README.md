@@ -26,7 +26,15 @@ Setup environment variables.
 * **SCDRE_USR**             - Usrname to use on login.
 * **SCDRE_PWD**             - Password to use on login.
 * **SCDRE_URL**             - Absolute URL to website.
+* **SCDRE_EMAIL_USR**       - Email username to send notification from & to.
+* **SCDRE_EMAIL_PWD**       - Email password to use.
+* **SCDRE_EMAIL_PORT**      - Email port to use.
+* **SCDRE_EMAIL_HOST**      - Email host to use.
 * **SCDRE_FIREFOX_PROFILE** - Absolute path to firefox profile folder.
+
+		
+		'SCDRE_FIREFOX_PROFILE': environ['SCDRE_FIREFOX_PROFILE'],
+		'SCDRE_INSTANCE_PATH': instance_path
 
 Make sure your browser downloads are always saved into instance folder of this project.
 
@@ -36,10 +44,16 @@ Download files.
 python scraper.py downlaod-files
 ```
 
+Start checking for changes in web directory.
+
+```
+python scraper.py check-state
+```
+
 ## Authors
 
 Initial content for this project was provided by Matic Zagmajster. For more information please see ```AUTHORS``` file.
 
 ## License
 
-See the ```LICENSE.md``` file for details.
+See the ```LICENSE``` file for details.
