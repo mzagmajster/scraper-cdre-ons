@@ -216,6 +216,8 @@ class FileDownloader(object):
 					el3[0].click()
 					el3[0].mouse_over()
 					h = self.spobj.browser.html
+			else:
+				next_page = False
 
 		# We need to create directories on first lavel for proper file grouping.
 		if not level and len(dir_names):
