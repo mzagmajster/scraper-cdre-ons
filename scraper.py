@@ -12,6 +12,11 @@ def cli():
 @click.command('download-files', help="Download files.")
 def download_files():
 	conf = get_config()
+
+	if not len(conf.keys()):
+		print('Please make sure file "settings.json" exists and it is properly configured.')
+		return None
+
 	o = FileDownloader(conf)
 	o.login()
 	for  d in ROOT_DIRS:
@@ -24,10 +29,14 @@ def download_files():
 	o.statistics()
 
 
-
 @click.command('check-state', help="Check for change in web directory.")
 def check_state():
 	conf = get_config()
+
+	if not len(conf.keys()):
+		print('Please make sure file "settings.json" exists and it is properly configured.')
+		return None
+
 	# More configuration.
 	conf['_URL_TO_WATCH'] = URL_TO_WATCH
 
@@ -52,9 +61,15 @@ def check_state():
 
 	lo.spobj.quit()
 
+
 @click.command('test')
 def test():
 	conf = get_config()
+
+	if not len(conf.keys()):
+		print('Please make sure file "settings.json" exists and it is properly configured.')
+		return None
+
 	send_notification(conf)
 
 

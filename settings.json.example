@@ -1,0 +1,20 @@
+{
+	"SCDRE_USR": "<account login>",
+	"SCDRE_PWD": "<account password>",
+	"SCDRE_URL": "<base site url>",
+	"SCDRE_EMAIL_USR": "<email login>",
+	"SCDRE_EMAIL_PWD": "<email password>",
+	/*
+	 * Port used in email library.
+	 * Note: Data provided should be of type int. So no quotes around number. For example valid values
+	 * can be: 465, 128,...
+	 *
+	 */
+	"SCDRE_EMAIL_PORT": "<email port>",
+	"SCDRE_EMAIL_HOST": "<email host>",
+	/*
+	 * Used only with firefox driver.
+	 *
+	 */
+	"SCDRE_FIREFOX_PROFILE": "<absolute path to firefox profile>"
+}

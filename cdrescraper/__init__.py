@@ -5,6 +5,8 @@ from datetime import datetime
 
 import requests
 from mailer import Mailer, Message
+from simplejson import loads, dump
+from json_minify import json_minify
 
 from minsplinter import MinSplinter
 
@@ -21,7 +23,8 @@ URL_TO_WATCH = 'https://agentes.ons.org.br/publicacao/PrevisaoVazoes/preliminar/
 APPLICATION_FILES = [
 	'__init__',
 	'web-dirs',
-	'notification.html'
+	'notification.html',
+	'settings.json'
 ]
 
 # User agents to use (currently script chooses the first user-agent in list but that could be easily changed in WebDirectoryLister class).
@@ -54,17 +57,24 @@ def get_config():
 	instance_path = abspath(dirname(__file__)) + '/../instance'
 	instance_path = instance_path.replace('\\', '/')
 
-	c = {
-		'SCDRE_USR': environ['SCDRE_USR'],
-		'SCDRE_PWD': environ['SCDRE_PWD'],
-		'SCDRE_URL': environ['SCDRE_URL'],
-		'SCDRE_EMAIL_USR': environ['SCDRE_EMAIL_USR'],
-		'SCDRE_EMAIL_PWD': environ['SCDRE_EMAIL_PWD'],
-		'SCDRE_EMAIL_PORT': int(environ['SCDRE_EMAIL_PORT']),
-		'SCDRE_EMAIL_HOST': environ['SCDRE_EMAIL_HOST'],
-		'SCDRE_FIREFOX_PROFILE': environ['SCDRE_FIREFOX_PROFILE'],
-		'SCDRE_INSTANCE_PATH': instance_path
-	}
+	settings_file = instance_path + '/settings.json'
+
+	if not exists(settings_file):
+		settings_file_example = instance_path + '/../settings.json.example'
+		with open(settings_file_example, 'r') as fp1:
+			fp = open(settings_file, 'w')
+			fp.write(fp1.read())
+			fp.close()
+		return dict()
+
+	# Read settings from JSON file.
+	with open(settings_file, 'r') as fp:
+		raw_content = fp.read()
+		valid_json = json_minify(raw_content)
+		c = loads(valid_json)
+
+	c['SCDRE_INSTANCE_PATH'] = instance_path
+
 	return c
 
 
