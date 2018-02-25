@@ -19,7 +19,7 @@ def download_files():
 		# Wait for downloading process to complete.
 		print('Waiting for downloads to complete.')
 		sleep(7)
-		self.move_files()
+		o.move_files()
 
 	o.statistics()
 

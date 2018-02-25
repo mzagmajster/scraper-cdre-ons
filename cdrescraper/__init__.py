@@ -198,8 +198,14 @@ class FileDownloader(object):
 					h = ''
 				finally:
 					if self.is_file(h):
-						el2[0].click()
-						self._count += 1
+						try:
+							el2[0].click()
+							self._count += 1
+						except:
+							self.spobj.browser.back()
+							self.spobj.wait()
+							self.spobj.browser.reload()
+							el = self.spobj.find_elements('css', s)
 					else:
 						dirs.append(h)
 						dir_names.append(text)
@@ -252,7 +258,7 @@ class FileDownloader(object):
 			if isfile(p):
 				move(p, d)
 
-	def statistics():
+	def statistics(self):
 		"""None: Statistics"""
 		print(self._count, ' files downloaded.')
 
