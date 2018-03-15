@@ -16,5 +16,6 @@
 	 * Used only with firefox driver.
 	 *
 	 */
-	"SCDRE_FIREFOX_PROFILE": "<absolute path to firefox profile>"
+	"SCDRE_FIREFOX_PROFILE": "<absolute path to firefox profile>",
+	"SCDRE_DOWNLOAD_FOLDER": "<absolute path to default downloads folder>"
 }

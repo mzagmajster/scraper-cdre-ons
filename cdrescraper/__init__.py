@@ -121,7 +121,7 @@ class FileDownloader(object):
 		"""Initializer"""
 		self.config = dict(c)
 		spobj_conf = {
-			'DRIVER_NAME': 'firefox',
+			'DRIVER_NAME': 'chrome',
 			'PROFILE': self.config['SCDRE_FIREFOX_PROFILE'],
 			'USER_AGENT': USER_AGENTS[0]
 		}
@@ -134,6 +134,7 @@ class FileDownloader(object):
 		"""None: Login
 			Login to webstie to access resources.
 		"""
+		print('Visit ' + self.config['SCDRE_URL'])
 		self.spobj.visit(self.config['SCDRE_URL'])
 		self.spobj.wait()
 
@@ -155,6 +156,7 @@ class FileDownloader(object):
 		elist[0].click()
 
 		self.spobj.wait()
+		print('Logged in')
 
 	def get_cookies(self):
 		"""dict: Get cookies
@@ -181,6 +183,7 @@ class FileDownloader(object):
 		"""None: List
 			List all items in directory and all subdirectories.
 		 """
+		print('L: ', level, ' --> ', link)
 		self.spobj.visit(link)
 		self.spobj.wait()
 
@@ -208,8 +211,10 @@ class FileDownloader(object):
 					h = ''
 				finally:
 					if self.is_file(h):
+						print('Downloading... ', h)
 						try:
-							el2[0].click()
+							self.spobj.visit(h)
+							self.spobj.wait()
 							self._count += 1
 						except:
 							self.spobj.browser.back()
@@ -229,9 +234,12 @@ class FileDownloader(object):
 				# Ensure that we trigger click.
 				h = self.spobj.browser.html
 				while h == self.spobj.browser.html:
-					el3[0].click()
-					el3[0].mouse_over()
-					h = self.spobj.browser.html
+					try:
+						el3[0].click()
+						el3[0].mouse_over()
+						h = self.spobj.browser.html
+					except:
+						h = ''
 			else:
 				next_page = False
 
@@ -259,12 +267,12 @@ class FileDownloader(object):
 		# Forbidden files.
 		f = APPLICATION_FILES
 		d = self.config['SCDRE_INSTANCE_PATH'] + '/' + self._relevant_dir
-		for file in listdir(self.config['SCDRE_INSTANCE_PATH']):
+		for file in listdir(self.config['SCDRE_DOWNLOAD_FOLDER']):
 			# File must not be moved or already exists.
 			if file in f or exists('/'.join([d, file])):
 				continue
 
-			p = self.config['SCDRE_INSTANCE_PATH'] + '/' + file
+			p = self.config['SCDRE_DOWNLOAD_FOLDER'] + '/' + file
 			if isfile(p):
 				move(p, d)
 

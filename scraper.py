@@ -1,8 +1,10 @@
 from time import sleep
+from pyvirtualdisplay import Display
 import click
 
 from cdrescraper import get_config, FileDownloader, ROOT_DIRS, send_notification, WebDirectoryLister, URL_TO_WATCH
 
+from os import makedirs
 
 @click.group()
 def cli():
@@ -11,6 +13,8 @@ def cli():
 
 @click.command('download-files', help="Download files.")
 def download_files():
+	display = Display(visible=0, size=(1680, 1050))
+	display.start()
 	conf = get_config()
 
 	if not len(conf.keys()):
@@ -27,6 +31,7 @@ def download_files():
 		o.move_files()
 
 	o.statistics()
+	display.stop()
 
 
 @click.command('check-state', help="Check for change in web directory.")
@@ -73,9 +78,14 @@ def test():
 	send_notification(conf)
 
 
+@click.command('test2')
+def test2():
+	pass
+
 cli.add_command(download_files)
 cli.add_command(check_state)
 cli.add_command(test)
+cli.add_command(test2)
 
 if __name__ == '__main__':
 	cli()
