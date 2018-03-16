@@ -69,6 +69,8 @@ def check_state():
 
 @click.command('download-watch')
 def download_watch():
+	display = Display(visible=0, size=(1680, 1050))
+	display.start()
 	conf = get_config()
 
 	if not len(conf.keys()):
@@ -92,6 +94,7 @@ def download_watch():
 		print('Moved the files to ' + base_dir)
 
 	wl.spobj.quit()
+	display.stop()
 
 
 @click.command('test')
