@@ -288,18 +288,7 @@ class WebDirectoryLister(object):
 		 """
 		return '/'.join([self.config['SCDRE_INSTANCE_PATH'], self._web_dirs_file])
 
-	def __init__(self, c):
-		"""Initializer"""
-		self.config = dict(c)
-		self._web_dirs_file = 'web-dirs'
-		self._text = ''
-
-	def read(self):
-		"""int: Read content of web directory.
-			
-			Returns:
-				int: On usccessful read 0 is returned, 1 is returned otherwise.
-		"""
+	def _get_current_root(self):
 		# Get into proper subfolder.
 		d = datetime.now()
 		y = str(d.year)
@@ -307,10 +296,29 @@ class WebDirectoryLister(object):
 		if len(m) < 2:
 			m = '0' + m
 		nm = m + '_' + MONTHS[d.month - 1]
-		url = self.config['_URL_TO_WATCH'] + '{0}/{1}/'.format(y, nm)
+		self._current_root = self.config['_URL_TO_WATCH'] + '{0}/{1}/'.format(y, nm)
+		self._current_local_root = y + '-' + m
+
+
+	def __init__(self, c, spobj=None):
+		"""Initializer"""
+		self.config = dict(c)
+		self._web_dirs_file = 'web-dirs'
+		self._text = ''
+		self._current_root = ''
+		self._current_local_root = ''
+		self.spobj = spobj
+
+	def read(self):
+		"""int: Read content of web directory.
+			
+			Returns:
+				int: On usccessful read 0 is returned, 1 is returned otherwise.
+		"""
+		self._get_current_root()
 
 		h = {'user-agent': USER_AGENTS[0]}
-		r = requests.get(url, headers=h, cookies=self.config['_COOKIES'])
+		r = requests.get(self._current_root, headers=h, cookies=self.config['_COOKIES'])
 		if r.status_code != 200:
 			return 1
 
@@ -341,5 +349,80 @@ class WebDirectoryLister(object):
 		fp = open(self._get_web_dir_file(), 'w')
 		fp.write(self._text)
 		fp.close()
+
+	def list(self, current_folder=None):
+		self._get_current_root()
+
+		# Open up base page.
+		self.spobj.visit(self._current_root)
+		self.spobj.wait()
+
+		# Base path.
+		base_path = self.config['SCDRE_INSTANCE_PATH'] + '/' + self._current_local_root
+
+		# First link on page is always link to parent directory.
+		links = self.spobj.find_elements('css', 'a')
+
+		c = list()
+
+		# We got list of folders that we need to look in.
+		if current_folder is None:
+			i = 1
+			while i < len(links):
+				c.append(links[i]['href'])
+				t = links[i]['href'].split('/')
+				p = base_path + '/' + t[-2]
+				if not exists(p):
+					makedirs(p)
+				i += 1
+
+			return c
+
+		# Get into current folder.
+		self.spobj.visit(current_folder)
+		self.spobj.wait()
+
+		# Local folder to move files into.
+		t = current_folder.split('/')
+		p = base_path + '/' + t[-2]
+
+		# Filter files so we can change current page if required.
+		files = self.spobj.find_elements('css', 'a')
+		i = 1
+		fl = list()
+		while i < len(files):
+			fl.append(files[i]['href'])
+			i += 1
+
+		for link in fl:
+			self.spobj.visit(link)
+			t = link.split('/')
+
+			# Wait for file to download before continuing.
+			dl = self.config['SCDRE_DOWNLOAD_FOLDER'] + '/' + t[-1]
+			while not exists(dl):
+				pass
+
+			self.spobj.wait()
+
+		return p
+
+	def move_files(self, d):
+		"""None: Move files
+			Move local files to correct sub-directory to prevent trubles because of same names on diffrent files.
+		"""
+
+		# Forbidden files.
+		f = APPLICATION_FILES
+		for file in listdir(self.config['SCDRE_DOWNLOAD_FOLDER']):
+			# File must not be moved or already exists.
+			if file in f or exists('/'.join([d, file])):
+				continue
+
+			p = self.config['SCDRE_DOWNLOAD_FOLDER'] + '/' + file
+			if isfile(p):
+				move(p, d)
+
+
 
 

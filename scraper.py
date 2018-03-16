@@ -67,6 +67,33 @@ def check_state():
 	lo.spobj.quit()
 
 
+@click.command('download-watch')
+def download_watch():
+	conf = get_config()
+
+	if not len(conf.keys()):
+		print('Please make sure file "settings.json" exists and it is properly configured.')
+		return None
+
+	conf['_URL_TO_WATCH'] = URL_TO_WATCH
+
+	# Authenticate,
+	lo = FileDownloader(conf)
+	lo.login()
+
+	# Now create web lister to download stuff.
+	wl = WebDirectoryLister(conf, lo.spobj)
+
+	dirs = wl.list()
+	for link in dirs:
+		base_dir = wl.list(link)
+		print('Downloaded the files.')
+		wl.move_files(base_dir)
+		print('Moved the files to ' + base_dir)
+
+	wl.spobj.quit()
+
+
 @click.command('test')
 def test():
 	conf = get_config()
@@ -84,6 +111,7 @@ def test2():
 
 cli.add_command(download_files)
 cli.add_command(check_state)
+cli.add_command(download_watch)
 cli.add_command(test)
 cli.add_command(test2)
 
